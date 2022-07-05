@@ -1,0 +1,31 @@
+### PersistentVolume ###
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: airflow-dags
+  labels:
+    type: local
+spec:
+  storageClassName: hostpath
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: DAG_DIR
+  persistentVolumeReclaimPolicy: Retain
+
+---
+
+### PersistentVolumeClaim ###
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: airflow-dags-pvc
+spec:
+  storageClassName: hostpath
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
