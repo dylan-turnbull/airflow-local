@@ -38,6 +38,8 @@ kubectl apply -f airflow-volume.yml
 
 helm repo add apache-airflow https://airflow.apache.org/
 
+helm repo update
+
 helm install my-airflow apache-airflow/airflow --version 1.6.0 -f values.yml
 ```
 
