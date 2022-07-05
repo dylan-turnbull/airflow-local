@@ -26,4 +26,19 @@
 2. Clone this repository
     - `git clone yada-yada-yada`
 
+Work in progress, for now, use this:
+```
+mkdir ~/Documents/airflow-dags
+cp -r example-dags/* ~/Documents/airflow-dags
+
+#### Update Docker desktop settings to allow mounting the ~/Documents/airflow-dags directory ####
+
+# edit airflow-volume.yml to point to the full airflow-dags path
+kubectl apply -f airflow-volume.yml
+
+
+helm install my-airflow apache-airflow/airflow --version 1.6.0 -f values.yml
+```
+
 path: "{HOME_DIR}/airflow-dags"
+
