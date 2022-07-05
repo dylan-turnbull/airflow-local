@@ -36,6 +36,7 @@ cp -r example-dags/* ~/Documents/airflow-dags
 # edit airflow-volume.yml to point to the full airflow-dags path
 kubectl apply -f airflow-volume.yml
 
+helm repo add apache-airflow https://airflow.apache.org/
 
 helm install my-airflow apache-airflow/airflow --version 1.6.0 -f values.yml
 ```
