@@ -24,7 +24,7 @@
         choco install k9s
         ```
 2. Clone this repository
-    - `git clone yada-yada-yada`
+    - `git clone https://github.com/dylan-turnbull/airflow-local.git`
 
 Work in progress, for now, use this:
 ```
