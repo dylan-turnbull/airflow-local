@@ -25,3 +25,5 @@ metadata:
 spec:
   storageClassName: hostpath
   volumeName: airflow-dags
+  accessModes:
+    - ReadWriteMany
