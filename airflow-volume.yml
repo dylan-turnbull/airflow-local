@@ -24,8 +24,4 @@ metadata:
   name: airflow-dags-pvc
 spec:
   storageClassName: hostpath
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Gi
+  volumeName: airflow-dags
