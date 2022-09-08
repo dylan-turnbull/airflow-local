@@ -27,3 +27,6 @@ spec:
   volumeName: airflow-dags
   accessModes:
     - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
