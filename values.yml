@@ -2,4 +2,16 @@ local_dag_path: /Users/dturnb59/Documents/airflow
 
 airflow:
   executor: KubernetesExecutor
-# executor: CeleryExecutor
+  # executor: CeleryExecutor
+
+  # Airflow Dag Processor Config
+  dagProcessor:
+    enabled: true
+    # Number of airflow dag processors in the deployment
+    replicas: 1
+    # Max number of old replicasets to retain
+    revisionHistoryLimit: ~
+    # Command to use when running Airflow dag processors (templated).
+    command: ~
+    # Args to use when running Airflow dag processor (templated).
+    args: ["bash", "-c", "exec airflow dag-processor"]
