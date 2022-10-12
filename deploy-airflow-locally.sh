@@ -1,8 +1,12 @@
-echo "Storing dags in ${1}"
+volume_dir=$(yq '.local_dag_path' values.yml)
+mkdir -p ${volume_dir}
+cp -r example-dags/* ${volume_dir}
+CHARTS=$(helm list -q -A)
 
-mkdir -p ${1}
-
-cp -r example-dags/* ${1}
-
-kubectl create -f $(sed "s/DAG_DIR/'${1}'/g" airflow-volume.yml)
-
+if echo "$CHARTS" | grep -F -wq "local-airflow"; then 
+    echo Updating Airflow...
+    helm upgrade local-airflow ./airflow -f values.yml
+else
+    echo Installing Airflow...
+    helm install local-airflow ./airflow -f values.yml
+fi

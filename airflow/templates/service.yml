@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: airflow-nodeport
+spec:
+  type: NodePort
+  selector:
+    component: webserver
+    release: airflow
+    tier: airflow
+  ports:
+      # By default and for convenience, the `targetPort` is set to the same value as the `port` field.
+    - port: 8080
+      nodePort: 32080

@@ -1,5 +1,11 @@
 # Run Airflow Locally
 
+**Prerequisites**
+- k9s -> `brew install k9s`
+- kubectl -> `brew install kubectl`
+- helm -> `brew install helm`
+- yq -> `brew install yq`
+
 ## Prerequisites
 1. Download K9s
     - MacOs  
@@ -25,26 +31,15 @@
         ```
 2. Clone this repository
     - `git clone https://github.com/dylan-turnbull/airflow-local.git`
+    
+3. Edit `values.yml` to point to the full airflow-dags path.
 
-Work in progress, for now, use this:
-```
-mkdir ~/Documents/airflow-dags
-cp -r example-dags/* ~/Documents/airflow-dags
+4. Deploy Airflow
+    - `sh deploy-airflow-locally.sh`
 
-#### Update Docker desktop settings to allow mounting the ~/Documents/airflow-dags directory ####
-
-# edit airflow-volume.yml to point to the full airflow-dags path
-kubectl apply -f airflow-volume.yml
-
-helm repo add apache-airflow https://airflow.apache.org/
-
-helm repo update
-
-helm install my-airflow apache-airflow/airflow --version 1.6.0 -f values.yml
-```
-
-path: "{HOME_DIR}/airflow-dags"
-
-**Note:**
+**Note:**  
 You can switch between the kubernetes and celery executors by updating the values.yml file
 
+## Connecting to the Airflow UI
+Create a port forward to the webserver: `kubectl port-forward deployment/local-airflow-webserver 8080:8080`
+Open a browser and navigate to `http://localhost:8080/`

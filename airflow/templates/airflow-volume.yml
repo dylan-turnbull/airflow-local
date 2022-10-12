@@ -12,7 +12,7 @@ spec:
   accessModes:
     - ReadWriteMany
   hostPath:
-    path: DAG_DIR
+    path: {{ .Values.local_dag_path }}
   persistentVolumeReclaimPolicy: Retain
 
 ---
