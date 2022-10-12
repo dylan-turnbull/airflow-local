@@ -45,3 +45,6 @@ helm install my-airflow apache-airflow/airflow --version 1.6.0 -f values.yml
 
 path: "{HOME_DIR}/airflow-dags"
 
+**Note:**
+You can switch between the kubernetes and celery executors by updating the values.yml file
+
