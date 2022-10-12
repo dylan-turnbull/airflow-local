@@ -1,3 +1,6 @@
+executor: "CeleryExecutor"
+# executor: "KubernetesExecutor"
+
 dags:
   persistence:
     # Enable persistent volume for storing dags
