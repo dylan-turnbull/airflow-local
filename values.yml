@@ -1,11 +1,23 @@
-executor: "CeleryExecutor"
-# executor: "KubernetesExecutor"
+local_dag_path: ""
 
-dags:
-  persistence:
-    # Enable persistent volume for storing dags
-    enabled: true
-    ## the name of an existing PVC to use
-    existingClaim: airflow-dags-pvc
-    ## optional subpath for dag volume mount
-    subPath: ~
+airflow:
+  executor: "CeleryExecutor"
+  # executor: "KubernetesExecutor"
+
+  dags:
+    persistence:
+      # Enable persistent volume for storing dags
+      enabled: true
+      ## the name of an existing PVC to use
+      existingClaim: airflow-dags-pvc
+      ## optional subpath for dag volume mount
+      subPath: ~
+
+  webserver:
+    service:
+      type: NodePort
+      annotations: {}
+      ports:
+        - name: airflow-ui
+          port: "{{ .Values.ports.airflowUI }}"
+          nodePort: 38080

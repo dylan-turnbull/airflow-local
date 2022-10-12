@@ -1,0 +1,10 @@
+apiVersion: v2
+name: airflow
+description: A Helm chart for deploying Apache Airflow
+type: application
+version: 1.6.0
+icon: https://cwiki.apache.org/confluence/download/attachments/145723561/airflow_transparent.png
+dependencies:
+  - name: airflow
+    version: 1.6.0
+    repository: https://airflow.apache.org
