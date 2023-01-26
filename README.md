@@ -119,7 +119,15 @@ k9s
 
 ### 4. Log in with username "admin" and password "admin"
 
-### 5. Select a sample DAG (e.g. "example_bash_operator") and trigger it!
+### 5. Do stuff
+
+**Select a sample DAG and trigger it**
 
 ![alt text](images/k9s.png)
+
+**Create a new DAG**
+
+![alt text](images/create_new_dag.png)
+
+Remember: DAG files are stored in `~/Documents/airflow-dags`
 
