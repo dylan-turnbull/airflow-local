@@ -3,13 +3,13 @@
 According to the official [Airflow Installation](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html#) docs, there are several ways to install Airflow 2 locally. To encourage standardization of local environments at Avant, we offer our own instructions for installing Airflow. 
 
 ## Prerequisites
-### 0. \[Optional\] Install your preferred package manager
+### \[Optional\] Install your preferred package manager
 
 * [Homebrew](https://brew.sh/) (macOS, Linux)
 * [Scoop](https://scoop.sh/) (Windows)
 * [Chocolatey](https://chocolatey.org/install) (Windows)
 
-### 1. Install K9s
+### Install K9s
 
 **macOS**
 ```bash
@@ -38,7 +38,7 @@ scoop install k9s
 choco install k9s
 ```
 
-### 2. Install Helm
+### Install Helm
 
 **macOS**
 ```bash
@@ -67,11 +67,11 @@ scoop install helm
 choco install kubernetes-helm
 ```
 
-### 3. Install Docker Desktop
+### Install Docker Desktop
 
 Install [Docker Desktop](https://www.docker.com/products/docker-desktop/), and use your Avant email to create a Docker account. 
 
-### 4. Clone the `airflow-local` repository
+### Clone the `airflow-local` repository
 
 ```bash
 git clone https://github.com/dylan-turnbull/airflow-local.git
@@ -79,18 +79,18 @@ git clone https://github.com/dylan-turnbull/airflow-local.git
 
 ## Install Airflow 2
 
-### 1. Copy sample DAGs to relevant directory
+### Copy sample DAGs to relevant directory
 
 ```bash
 mkdir ~/Documents/airflow-dags
 cp -r example-dags/* ~/Documents/airflow-dags
 ```
 
-### 2. Update Docker Desktop settings to allow mounting the `~/Documents/airflow-dags` directory
+### Update Docker Desktop settings to allow mounting the `~/Documents/airflow-dags` directory
 
 ![alt text](images/mount_directory.png)
 
-### 3. Complete Airflow installation
+### Complete Airflow installation
 
 ```bash
 kubectl apply -f airflow-volume.yml
@@ -103,13 +103,13 @@ helm install my-airflow apache-airflow/airflow --version 1.6.0 -f values.yml
 
 ## Ok Now What?
 
-### 1. Open a new terminal and run `k9s`
+### Open a new terminal and run `k9s`
 
 ```bash
 k9s
 ```
 
-### 2. "Port-Forward" `my-airflow-webserver`
+### "Port-Forward" `my-airflow-webserver`
 
 * Scroll down to `my-airflow-webserver` service
 * Type `<shift>` + `<f>`
@@ -117,11 +117,11 @@ k9s
 
 ![alt text](images/k9s.png)
 
-### 3. Open the Airflow UI in your web browser (`http://localhost:8080/home`) 
+### Open the Airflow UI in your web browser (`http://localhost:8080/home`) 
 
-### 4. Log in with username "admin" and password "admin"
+### Log in with username "admin" and password "admin"
 
-### 5. Do stuff
+### Do stuff
 
 **Select an existing DAG and trigger it from the UI**
 
