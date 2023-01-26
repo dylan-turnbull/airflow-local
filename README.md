@@ -117,9 +117,10 @@ k9s
 
 ![alt text](images/k9s.png)
 
-### Open the Airflow UI in your web browser (`http://localhost:8080/home`) 
+### Open the Airflow UI
 
-### Log in with username "admin" and password "admin"
+* In your web browser, go to [http://localhost:8080/home](http://localhost:8080/home) 
+* Log into Airflow with username "admin" and password "admin"
 
 ### Do stuff
 
@@ -138,6 +139,7 @@ k9s
 * Run ```airflow dags trigger <new_dag_id>```
 
 ![alt text](images/create_new_dag.png)
+
 ![alt text](images/airflow_cli.png)
 
 **NOTE**: You can exit out of the `k9s` shell by running the `exit` command, and you can "back out" of `k9s` filters by using `<esc>`.
