@@ -77,20 +77,20 @@ Install [Docker Desktop](https://www.docker.com/products/docker-desktop/), and u
 git clone https://github.com/dylan-turnbull/airflow-local.git
 ```
 
-### 5. Install Airflow 2
+## Install Airflow 2
 
-**Copy sample DAGs to relevant directory**
+### 1. Copy sample DAGs to relevant directory
 
 ```bash
 mkdir ~/Documents/airflow-dags
 cp -r example-dags/* ~/Documents/airflow-dags
 ```
 
-**Update Docker desktop settings to allow mounting the `~/Documents/airflow-dags` directory**
+### 2. Update Docker Desktop settings to allow mounting the `~/Documents/airflow-dags` directory
 
 ![alt text](images/mount_directory.png)
 
-**Complete Airflow installation**
+### 3. Complete Airflow installation
 
 ```bash
 kubectl apply -f airflow-volume.yml
@@ -98,7 +98,6 @@ helm repo add apache-airflow https://airflow.apache.org/
 helm repo update
 helm install my-airflow apache-airflow/airflow --version 1.6.0 -f values.yml
 ```
-
 
 **NOTE**: You can switch between the kubernetes and celery executors by updating the `values.yml` file.
 
