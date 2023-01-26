@@ -121,13 +121,20 @@ k9s
 
 ### 5. Do stuff
 
-**Select a sample DAG and trigger it**
+**Select an existing DAG and trigger it from the UI**
+
+* Click on DAG in the home page
+* Click "play" button in the DAGs page
 
 ![alt text](images/k9s.png)
 
-**Create a new DAG**
+**Create a new DAG and trigger it from the command line**
+
+* Create new python script (REMEMBER: DAG files are stored in `~/Documents/airflow-dags`)
+* In `k9s`, select `my-airflow-webserver` service (using `<return>`)
+* Access the shell of the running pod (using `<s>`)
+* Run ```airflow dags trigger <new_dag_id>```
 
 ![alt text](images/create_new_dag.png)
-
-Remember: DAG files are stored in `~/Documents/airflow-dags`
+![alt text](images/airflow_cli.png)
 
