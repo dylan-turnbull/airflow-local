@@ -80,6 +80,7 @@ git clone https://github.com/dylan-turnbull/airflow-local.git
 ### 5. Install Airflow 2
 
 **Copy sample DAGs to relevant directory**
+
 ```bash
 mkdir ~/Documents/airflow-dags
 cp -r example-dags/* ~/Documents/airflow-dags
@@ -89,6 +90,7 @@ cp -r example-dags/* ~/Documents/airflow-dags
 ![alt text](images/mount_directory.png)
 
 **Complete Airflow installation**
+
 ```bash
 kubectl apply -f airflow-volume.yml
 helm repo add apache-airflow https://airflow.apache.org/
@@ -96,8 +98,8 @@ helm repo update
 helm install my-airflow apache-airflow/airflow --version 1.6.0 -f values.yml
 ```
 
-**Note**
-You can switch between the kubernetes and celery executors by updating the `values.yml` file.
+
+NOTE: You can switch between the kubernetes and celery executors by updating the `values.yml` file.
 
 ## Ok Now What?
 
@@ -137,4 +139,6 @@ k9s
 
 ![alt text](images/create_new_dag.png)
 ![alt text](images/airflow_cli.png)
+
+NOTE: You can exit out of the `k9s` shell by running the `exit` command, and you can "back out" of `k9s` filters by using `<esc>`.
 
