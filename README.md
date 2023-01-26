@@ -87,6 +87,7 @@ cp -r example-dags/* ~/Documents/airflow-dags
 ```
 
 **Update Docker desktop settings to allow mounting the `~/Documents/airflow-dags` directory**
+
 ![alt text](images/mount_directory.png)
 
 **Complete Airflow installation**
@@ -99,7 +100,7 @@ helm install my-airflow apache-airflow/airflow --version 1.6.0 -f values.yml
 ```
 
 
-NOTE: You can switch between the kubernetes and celery executors by updating the `values.yml` file.
+**NOTE**: You can switch between the kubernetes and celery executors by updating the `values.yml` file.
 
 ## Ok Now What?
 
@@ -128,11 +129,11 @@ k9s
 * Click on DAG in the home page
 * Click "play" button in the DAGs page
 
-![alt text](images/k9s.png)
+![alt text](images/trigger_dag.png)
 
 **Create a new DAG and trigger it from the command line**
 
-* Create new python script (REMEMBER: DAG files are stored in `~/Documents/airflow-dags`)
+* Create new python script (**REMEMBER**: DAG files are stored in `~/Documents/airflow-dags`)
 * In `k9s`, select `my-airflow-webserver` service (using `<return>`)
 * Access the shell of the running pod (using `<s>`)
 * Run ```airflow dags trigger <new_dag_id>```
@@ -140,5 +141,5 @@ k9s
 ![alt text](images/create_new_dag.png)
 ![alt text](images/airflow_cli.png)
 
-NOTE: You can exit out of the `k9s` shell by running the `exit` command, and you can "back out" of `k9s` filters by using `<esc>`.
+**NOTE**: You can exit out of the `k9s` shell by running the `exit` command, and you can "back out" of `k9s` filters by using `<esc>`.
 
