@@ -96,6 +96,28 @@ helm repo update
 helm install my-airflow apache-airflow/airflow --version 1.6.0 -f values.yml
 ```
 
-**Note:**
-You can switch between the kubernetes and celery executors by updating the values.yml file
+**Note**
+You can switch between the kubernetes and celery executors by updating the `values.yml` file.
+
+## Ok Now What?
+
+### 1. Open a new terminal and run `k9s`
+
+```bash
+k9s
+```
+
+### 2. "Port-Forward" `my-airflow-webserver`
+
+* Scroll down to `my-airflow-webserver` service
+* Type `<shift>` + `<f>`
+* Select `OK`
+
+![alt text](images/k9s.png)
+
+### 3. Open the Airflow UI in your web browser (`http://localhost:8080/home`)
+
+### 4. Select a sample DAG (e.g. "example_bash_operator") and trigger it!
+
+![alt text](images/k9s.png)
 
