@@ -115,9 +115,11 @@ k9s
 
 ![alt text](images/k9s.png)
 
-### 3. Open the Airflow UI in your web browser (`http://localhost:8080/home`)
+### 3. Open the Airflow UI in your web browser (`http://localhost:8080/home`) 
 
-### 4. Select a sample DAG (e.g. "example_bash_operator") and trigger it!
+### 4. Log in with username "admin" and password "admin"
+
+### 5. Select a sample DAG (e.g. "example_bash_operator") and trigger it!
 
 ![alt text](images/k9s.png)
 
