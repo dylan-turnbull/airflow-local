@@ -77,29 +77,38 @@ Install [Docker Desktop](https://www.docker.com/products/docker-desktop/), and u
 git clone https://github.com/dylan-turnbull/airflow-local.git
 ```
 
-## Install Airflow 2
+## Install Airflow 2 (simple)
 
 ### Copy sample DAGs to relevant directory
 
 ```bash
-mkdir ~/Documents/airflow-dags
-cp -r example-dags/* ~/Documents/airflow-dags
+export DAGS_DIR="Documents/airflow-dags"
+mkdir ~/${DAGS_DIR}
+cp -r airflow-local/example-dags/* ~/${DAGS_DIR}
 ```
 
-### Update Docker Desktop settings to allow mounting the `~/Documents/airflow-dags` directory
+### Set up volume mounting
+
+* Update Docker Desktop settings to allow mounting the `~/Documents/airflow-dags` directory (see screencap)
+* In `airflow-volume.yml,` set the "PersistentVolume" configuration for `spec.hostPath.path` to `~/Documents/airflow-dags`
 
 ![alt text](images/mount_directory.png)
 
 ### Complete Airflow installation
 
 ```bash
-kubectl apply -f airflow-volume.yml
+kubectl apply -f airflow-local/airflow-volume.yml
 helm repo add apache-airflow https://airflow.apache.org/
 helm repo update
-helm install my-airflow apache-airflow/airflow --version 1.6.0 -f values.yml
+helm install airflow apache-airflow/airflow --version 1.6.0 -f values.yml
 ```
 
-**NOTE**: You can switch between the kubernetes and celery executors by updating the `values.yml` file.
+You should now have an installed Airflow chart (with release name "airflow" and namespace "default"). Confirm this by running `helm list`. 
+
+```bash
+NAME      	NAMESPACE	STATUS  	CHART        	APP VERSION
+airflow	default  	deployed	airflow-1.6.0	2.3.0
+```
 
 ## Ok Now What?
 
@@ -108,6 +117,8 @@ helm install my-airflow apache-airflow/airflow --version 1.6.0 -f values.yml
 ```bash
 k9s
 ```
+
+**NOTE**: You can switch between the kubernetes and celery executors by updating the `values.yml` file.
 
 ### "Port-Forward" `my-airflow-webserver`
 
@@ -143,4 +154,42 @@ k9s
 ![alt text](images/airflow_cli.png)
 
 **NOTE**: You can exit out of the `k9s` shell by running the `exit` command, and you can "back out" of `k9s` filters by using `<esc>`.
+
+## Install Airflow 2 (advanced)
+
+If you want to install extra dependencies (e.g. a provider package) as part of your Airflow deployment you can do so in a custom Docker image.
+
+### Update Dockerfile with relevant dependencies
+
+```
+FROM apache/airflow
+COPY . /opt/airflow/dags
+RUN pip install --no-cache-dir apache-airflow-providers-databricks
+```
+
+### Copy sample DAGs and Dockerfile to relevant directory
+
+```bash
+export DAGS_DIR="Documents/airflow-dags"
+mkdir ~/${DAGS_DIR}
+cp -r airflow-local/example-dags/* ~/${DAGS_DIR}
+cp airflow-local/Dockerfile ~/${DAGS_DIR}/Dockerfile
+```
+
+### Complete Airflow installation
+
+```bash
+docker build --pull --tag my-image:0.0.1 ~/${DAGS_DIR}
+helm repo add apache-airflow https://airflow.apache.org/
+helm repo update
+kubectl apply -f airflow-local/airflow-volume.yml
+helm install airflow apache-airflow/airflow \
+    --namespace default \
+    --version 1.6.0 -f airflow-local/values.yml \
+    --set images.airflow.repository=my-image \
+    --set images.airflow.tag=0.0.1 \
+    --wait=false
+```
+
+**ref**: https://github.com/airflow-helm/charts/tree/main/charts/airflow#frequently-asked-questions
 

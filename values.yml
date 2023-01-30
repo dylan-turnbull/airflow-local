@@ -1,3 +1,7 @@
+config:
+  webserver:
+    expose_config: "True"
+
 executor: "CeleryExecutor"
 # executor: "KubernetesExecutor"
 
@@ -5,7 +9,7 @@ dags:
   persistence:
     # Enable persistent volume for storing dags
     enabled: true
-    ## the name of an existing PVC to use
+    ## the name of an existing PVC to use (see airflow-volume.yml)
     existingClaim: airflow-dags-pvc
     ## optional subpath for dag volume mount
     subPath: ~
