@@ -3,68 +3,10 @@
 According to the official [Airflow Installation](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html#) docs, there are several ways to install Airflow 2 locally. To encourage standardization of local environments at Avant, we offer our own instructions for installing Airflow. 
 
 ## Prerequisites
-### \[Optional\] Install your preferred package manager
-
-* [Homebrew](https://brew.sh/) (macOS, Linux)
-* [Scoop](https://scoop.sh/) (Windows)
-* [Chocolatey](https://chocolatey.org/install) (Windows)
-
-### Install K9s
-
-**macOS**
+### Install required packages via homebrew
 ```bash
-# Via Homebrew
-brew install derailed/k9s/k9s
-
-# Via MacPort
-sudo port install k9s
-```
-
-**Linux**
-```bash
-# Via LinuxBrew
-brew install derailed/k9s/k9s
-
-# Via PacMan
-pacman -S k9s
-```
-
-**Windows**
-```bash
-# Via Scoop
-scoop install k9s
-
-# Via Chocolatey
-choco install k9s
-```
-
-### Install Helm
-
-**macOS**
-```bash
-# Via Homebrew
 brew install helm
-
-# Via MacPort
-sudo port install helm-3.11
-```
-
-**Linux**
-```bash
-# Via LinuxBrew
-brew install helm
-
-# Via PacMan
-pacman -S helm
-```
-
-**Windows**
-```bash
-# Via Scoop
-scoop install helm
-
-# Via Chocolatey
-choco install kubernetes-helm
+brew install derailed/k9s/k9s
 ```
 
 ### Install Docker Desktop
@@ -88,7 +30,7 @@ cp -r airflow-local/example-dags/* ~/${DAGS_DIR}
 ```
 
 ### Set up volume mounting
-
+This isn't required
 * Update Docker Desktop settings to allow mounting the `~/Documents/airflow-dags` directory (see screencap)
 * In `airflow-volume.yml,` set the "PersistentVolume" configuration for `spec.hostPath.path` to `~/Documents/airflow-dags`
 
