@@ -116,41 +116,37 @@ Restart the webserver pod when you make a change to a DAG file. Do this in `k9s`
     * `persistentvolume`
     * `pvc`
 
-## Install Airflow 2 (advanced)
+# Advanced setup
+Complete the basic setup prior to proceeding through this section.
 
-If you want to install extra dependencies (e.g. a provider package) as part of your Airflow deployment you can do so in a custom Docker image.
+## Create a custom docker image
+Follow these steps to extend the base Airflow image as desired, e.g. to add a databricks provider.
 
-### Update Dockerfile with relevant dependencies
+1. Create a copy of the Dockerfile in this repo
+    ```bash
+    cp airflow-local/Dockerfile ~/${DAGS_DIR}/Dockerfile
+    ```
 
+2. Edit the new dockerfile like so
+    ```
+    FROM apache/airflow
+    COPY . /opt/airflow/dags
+    RUN pip install --no-cache-dir apache-airflow-providers-databricks
+    ```
+
+3. Build the image
+    ```bash
+    docker build --pull --tag my-image:0.0.1 ~/${DAGS_DIR}
+    ```
+
+## Start Airflow using the custom image
 ```
-FROM apache/airflow
-COPY . /opt/airflow/dags
-RUN pip install --no-cache-dir apache-airflow-providers-databricks
-```
-
-### Copy sample DAGs and Dockerfile to relevant directory
-
-```bash
-export DAGS_DIR="Documents/airflow-dags"
-mkdir ~/${DAGS_DIR}
-cp -r airflow-local/example-dags/* ~/${DAGS_DIR}
-cp airflow-local/Dockerfile ~/${DAGS_DIR}/Dockerfile
-```
-
-### Complete Airflow installation
-
-```bash
-docker build --pull --tag my-image:0.0.1 ~/${DAGS_DIR}
-helm repo add apache-airflow https://airflow.apache.org/
-helm repo update
-kubectl apply -f airflow-local/airflow-volume.yml
 helm install airflow apache-airflow/airflow \
-    --namespace default \
-    --version 1.6.0 -f airflow-local/values.yml \
+    --namespace airflow \
+    -f airflow-local/values.yml \
     --set images.airflow.repository=my-image \
     --set images.airflow.tag=0.0.1 \
     --wait=false
 ```
 
-**ref**: https://github.com/airflow-helm/charts/tree/main/charts/airflow#frequently-asked-questions
-
+ref: https://github.com/airflow-helm/charts/tree/main/charts/airflow#frequently-asked-questions
