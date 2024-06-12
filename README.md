@@ -19,9 +19,10 @@ Install [Docker Desktop](https://www.docker.com/products/docker-desktop/), and u
 git clone https://github.com/dylan-turnbull/airflow-local.git
 ```
 
-## Install Airflow 2 (simple)
+# Basic setup
+This setup enables to you to point Airflow to any local directory containing DAG files: the DAGs needn't be in this repository in order for you to run them. We'll copy example DAGs from this repo to a new location to demonstrate this.
 
-### Copy sample DAGs to relevant directory
+## Copy sample DAGs to relevant directory
 
 ```bash
 export DAGS_DIR="Documents/airflow-dags"
@@ -29,28 +30,47 @@ mkdir ~/${DAGS_DIR}
 cp -r airflow-local/example-dags/* ~/${DAGS_DIR}
 ```
 
-### Set up volume mounting
-This isn't required
-* Update Docker Desktop settings to allow mounting the `~/Documents/airflow-dags` directory (see screencap)
-* In `airflow-volume.yml,` set the "PersistentVolume" configuration for `spec.hostPath.path` to `~/Documents/airflow-dags`
+## Kubernetes
+Airflow will be run in kubernetes via helm. We'll set it up in a namespace called `airflow` per the instructions that follow.
 
-![alt text](images/mount_directory.png)
+### Configure k8s context
+Enable kubernetes in your docker settings. This will configure your local kubernetes environment to run in the `docker-desktop` context. You can alternatively run via [minikube](https://minikube.sigs.k8s.io/docs/start/?arch=%2Fmacos%2Fx86-64%2Fstable%2Fbinary+download) if preferred.
 
-### Complete Airflow installation
+![alt text](images/docker-enable-kubernetes.png)
 
+Restart docker desktop.
+
+### Add airflow repo via helm
 ```bash
-kubectl apply -f airflow-local/airflow-volume.yml
 helm repo add apache-airflow https://airflow.apache.org/
 helm repo update
-helm install airflow apache-airflow/airflow --version 1.6.0 -f values.yml
 ```
 
-You should now have an installed Airflow chart (with release name "airflow" and namespace "default"). Confirm this by running `helm list`. 
+### Create persistent volume & persistent volume claim
+Kubernetes will access our local DAG files through a persistent volume and persistent volume claim. This is similar to volume mounting local directories to a container when using `docker-compose`.
+
+#### Update persistent volume path
+Update the value of `spec.hostPath.path` in `airflow-volume.yml` to the directory that you copied the example DAGs to in the preceeding section. Note that the full path is required, e.g. `"/Users/<user>/Documents/airflow-dags"` and not `"~/Documents/airflow-dags"`.
+
+#### Create the PV and PVC
+```bash
+kubectl apply -f airflow-local/airflow-volume.yml --namespace airflow
+```
+
+### Start airflow
+```bash
+helm install airflow apache-airflow/airflow --namespace airflow -f values.yml
+```
+
+You should now have an installed Airflow chart (with release name "airflow" and namespace "airflow"). Confirm this by running `helm list --namespace airflow`. 
 
 ```bash
-NAME      	NAMESPACE	STATUS  	CHART        	APP VERSION
-airflow	default  	deployed	airflow-1.6.0	2.3.0
+NAME     NAMESPACE  STATUS    CHART           APP VERSION
+airflow  airflow    deployed  airflow-1.13.1  2.8.3 
 ```
+
+Now open a new terminal and run `k9s --namespace airflow`. All pods should be running.
+![alt text](images/k9s-pods-running.png)
 
 ## Ok Now What?
 
