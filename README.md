@@ -72,50 +72,49 @@ airflow  airflow    deployed  airflow-1.13.1  2.8.3
 Now open a new terminal and run `k9s --namespace airflow`. All pods should be running.
 ![alt text](images/k9s-pods-running.png)
 
-## Ok Now What?
+## Using Airflow
+### Port forward
+You need to make the Airflow webserver accessible to your local machine:
 
-### Open a new terminal and run `k9s`
-
-```bash
-k9s
-```
-
-**NOTE**: You can switch between the kubernetes and celery executors by updating the `values.yml` file.
-
-### "Port-Forward" `my-airflow-webserver`
-
-* Scroll down to `my-airflow-webserver` service
+* Arrow down in `k9s` to the `webserver` pod
 * Type `<shift>` + `<f>`
 * Select `OK`
 
-![alt text](images/k9s.png)
+![alt text](images/port-forward.png)
 
 ### Open the Airflow UI
+In your web browser, go to [http://localhost:8080/home](http://localhost:8080/home). Log into Airflow with username `admin` and password `admin`.
 
-* In your web browser, go to [http://localhost:8080/home](http://localhost:8080/home) 
-* Log into Airflow with username "admin" and password "admin"
+### Run DAGs
+#### Trigger a DAG from the UI
 
-### Do stuff
+1. Click on DAG in the home page
+2. Click "play" button in the DAGs page
 
-**Select an existing DAG and trigger it from the UI**
+![alt text](images/trigger-dag-ui.png)
 
-* Click on DAG in the home page
-* Click "play" button in the DAGs page
+#### Trigger a DAG from the command line
+1. In `k9s`, access the shell of the `webserver` container using `<s>`
+![alt text](images/access-webserver-shell.png)
 
-![alt text](images/trigger_dag.png)
+2. Run `airflow dags trigger <dag_id>`
+![alt text](images/trigger-dag-cli.png)
 
-**Create a new DAG and trigger it from the command line**
+3. Type `exit` in the shell to return to `k9s`
 
-* Create new python script (**REMEMBER**: DAG files are stored in `~/Documents/airflow-dags`)
-* In `k9s`, select `my-airflow-webserver` service (using `<return>`)
-* Access the shell of the running pod (using `<s>`)
-* Run ```airflow dags trigger <new_dag_id>```
+### Making changes to a DAG
+Restart the webserver pod when you make a change to a DAG file. Do this in `k9s` with `<ctrl> + <d>` with the pod selected. The existing pod will terminate and the new pod will reflect your DAG changes. You'll need to port-forward the webserver again if interacting with the UI.
 
-![alt text](images/create_new_dag.png)
-
-![alt text](images/airflow_cli.png)
-
-**NOTE**: You can exit out of the `k9s` shell by running the `exit` command, and you can "back out" of `k9s` filters by using `<esc>`.
+### k9s operators
+* Drill down through pods, containers, and logs with `<return>`
+* Go back up a level with `<esc>`
+* Enter a container's shell with `<s>`
+* Delete elements with `<ctrl> + <d>`
+* General navigation with `<shift> + <;>`
+    * `pod`
+    * `namespace`
+    * `persistentvolume`
+    * `pvc`
 
 ## Install Airflow 2 (advanced)
 
