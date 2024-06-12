@@ -76,9 +76,9 @@ Now open a new terminal and run `k9s --namespace airflow`. All pods should be ru
 ### Port forward
 You need to make the Airflow webserver accessible to your local machine:
 
-* Arrow down in `k9s` to the `webserver` pod
-* Type `<shift>` + `<f>`
-* Select `OK`
+1. Arrow down in `k9s` to the `webserver` pod
+2. Type `<shift>` + `<f>`
+3. Select `OK`
 
 ![alt text](images/port-forward.png)
 
@@ -95,10 +95,10 @@ In your web browser, go to [http://localhost:8080/home](http://localhost:8080/ho
 
 #### Trigger a DAG from the command line
 1. In `k9s`, access the shell of the `webserver` container using `<s>`
-![alt text](images/access-webserver-shell.png)
+    ![alt text](images/access-webserver-shell.png)
 
 2. Run `airflow dags trigger <dag_id>`
-![alt text](images/trigger-dag-cli.png)
+    ![alt text](images/trigger-dag-cli.png)
 
 3. Type `exit` in the shell to return to `k9s`
 
