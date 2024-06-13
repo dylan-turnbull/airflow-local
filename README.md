@@ -3,68 +3,10 @@
 According to the official [Airflow Installation](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html#) docs, there are several ways to install Airflow 2 locally. To encourage standardization of local environments at Avant, we offer our own instructions for installing Airflow. 
 
 ## Prerequisites
-### \[Optional\] Install your preferred package manager
-
-* [Homebrew](https://brew.sh/) (macOS, Linux)
-* [Scoop](https://scoop.sh/) (Windows)
-* [Chocolatey](https://chocolatey.org/install) (Windows)
-
-### Install K9s
-
-**macOS**
+### Install required packages via homebrew
 ```bash
-# Via Homebrew
-brew install derailed/k9s/k9s
-
-# Via MacPort
-sudo port install k9s
-```
-
-**Linux**
-```bash
-# Via LinuxBrew
-brew install derailed/k9s/k9s
-
-# Via PacMan
-pacman -S k9s
-```
-
-**Windows**
-```bash
-# Via Scoop
-scoop install k9s
-
-# Via Chocolatey
-choco install k9s
-```
-
-### Install Helm
-
-**macOS**
-```bash
-# Via Homebrew
 brew install helm
-
-# Via MacPort
-sudo port install helm-3.11
-```
-
-**Linux**
-```bash
-# Via LinuxBrew
-brew install helm
-
-# Via PacMan
-pacman -S helm
-```
-
-**Windows**
-```bash
-# Via Scoop
-scoop install helm
-
-# Via Chocolatey
-choco install kubernetes-helm
+brew install derailed/k9s/k9s
 ```
 
 ### Install Docker Desktop
@@ -77,9 +19,10 @@ Install [Docker Desktop](https://www.docker.com/products/docker-desktop/), and u
 git clone https://github.com/dylan-turnbull/airflow-local.git
 ```
 
-## Install Airflow 2 (simple)
+# Basic setup
+This setup enables to you to point Airflow to any local directory containing DAG files: the DAGs needn't be in this repository in order for you to run them. We'll copy example DAGs from this repo to a new location to demonstrate this.
 
-### Copy sample DAGs to relevant directory
+## Copy sample DAGs to relevant directory
 
 ```bash
 export DAGS_DIR="Documents/airflow-dags"
@@ -87,109 +30,123 @@ mkdir ~/${DAGS_DIR}
 cp -r airflow-local/example-dags/* ~/${DAGS_DIR}
 ```
 
-### Set up volume mounting
+## Kubernetes
+Airflow will be run in kubernetes via helm. We'll set it up in a namespace called `airflow` per the instructions that follow.
 
-* Update Docker Desktop settings to allow mounting the `~/Documents/airflow-dags` directory (see screencap)
-* In `airflow-volume.yml,` set the "PersistentVolume" configuration for `spec.hostPath.path` to `~/Documents/airflow-dags`
+### Configure k8s context
+Enable kubernetes in your docker settings. This will configure your local kubernetes environment to run in the `docker-desktop` context. You can alternatively run via [minikube](https://minikube.sigs.k8s.io/docs/start/?arch=%2Fmacos%2Fx86-64%2Fstable%2Fbinary+download) if preferred.
 
-![alt text](images/mount_directory.png)
+![alt text](images/docker-enable-kubernetes.png)
 
-### Complete Airflow installation
+Restart docker desktop.
 
+### Add airflow repo via helm
 ```bash
-kubectl apply -f airflow-local/airflow-volume.yml
 helm repo add apache-airflow https://airflow.apache.org/
 helm repo update
-helm install airflow apache-airflow/airflow --version 1.6.0 -f values.yml
 ```
 
-You should now have an installed Airflow chart (with release name "airflow" and namespace "default"). Confirm this by running `helm list`. 
+### Create persistent volume & persistent volume claim
+Kubernetes will access our local DAG files through a persistent volume and persistent volume claim. This is similar to volume mounting local directories to a container when using `docker-compose`.
+
+#### Update persistent volume path
+Update the value of `spec.hostPath.path` in `airflow-volume.yml` to the directory that you copied the example DAGs to in the preceeding section. Note that the full path is required, e.g. `"/Users/<user>/Documents/airflow-dags"` and not `"~/Documents/airflow-dags"`.
+
+#### Create the PV and PVC
+```bash
+kubectl apply -f airflow-local/airflow-volume.yml --namespace airflow
+```
+
+### Start airflow
+```bash
+helm install airflow apache-airflow/airflow --namespace airflow -f values.yml
+```
+
+You should now have an installed Airflow chart (with release name "airflow" and namespace "airflow"). Confirm this by running `helm list --namespace airflow`. 
 
 ```bash
-NAME      	NAMESPACE	STATUS  	CHART        	APP VERSION
-airflow	default  	deployed	airflow-1.6.0	2.3.0
+NAME     NAMESPACE  STATUS    CHART           APP VERSION
+airflow  airflow    deployed  airflow-1.13.1  2.8.3 
 ```
 
-## Ok Now What?
+Now open a new terminal and run `k9s --namespace airflow`. All pods should be running.
+![alt text](images/k9s-pods-running.png)
 
-### Open a new terminal and run `k9s`
+## Using Airflow
+### Port forward
+You need to make the Airflow webserver accessible to your local machine:
 
-```bash
-k9s
-```
+1. Arrow down in `k9s` to the `webserver` pod
+2. Type `<shift>` + `<f>`
+3. Select `OK`
 
-**NOTE**: You can switch between the kubernetes and celery executors by updating the `values.yml` file.
-
-### "Port-Forward" `my-airflow-webserver`
-
-* Scroll down to `my-airflow-webserver` service
-* Type `<shift>` + `<f>`
-* Select `OK`
-
-![alt text](images/k9s.png)
+![alt text](images/port-forward.png)
 
 ### Open the Airflow UI
+In your web browser, go to [http://localhost:8080/home](http://localhost:8080/home). Log into Airflow with username `admin` and password `admin`.
 
-* In your web browser, go to [http://localhost:8080/home](http://localhost:8080/home) 
-* Log into Airflow with username "admin" and password "admin"
+### Run DAGs
+#### Trigger a DAG from the UI
 
-### Do stuff
+1. Click on DAG in the home page
+2. Click "play" button in the DAGs page
 
-**Select an existing DAG and trigger it from the UI**
+![alt text](images/trigger-dag-ui.png)
 
-* Click on DAG in the home page
-* Click "play" button in the DAGs page
+#### Trigger a DAG from the command line
+1. In `k9s`, access the shell of the `webserver` container using `<s>`
+    ![alt text](images/access-webserver-shell.png)
 
-![alt text](images/trigger_dag.png)
+2. Run `airflow dags trigger <dag_id>`
+    ![alt text](images/trigger-dag-cli.png)
 
-**Create a new DAG and trigger it from the command line**
+3. Type `exit` in the shell to return to `k9s`
 
-* Create new python script (**REMEMBER**: DAG files are stored in `~/Documents/airflow-dags`)
-* In `k9s`, select `my-airflow-webserver` service (using `<return>`)
-* Access the shell of the running pod (using `<s>`)
-* Run ```airflow dags trigger <new_dag_id>```
+### Making changes to a DAG
+Restart the webserver pod when you make a change to a DAG file. Do this in `k9s` with `<ctrl> + <d>` with the pod selected. The existing pod will terminate and the new pod will reflect your DAG changes. You'll need to port-forward the webserver again if interacting with the UI.
 
-![alt text](images/create_new_dag.png)
+### k9s operators
+* Drill down through pods, containers, and logs with `<return>`
+* Go back up a level with `<esc>`
+* Enter a container's shell with `<s>`
+* Delete elements with `<ctrl> + <d>`
+* General navigation with `<shift> + <;>`
+    * `pod`
+    * `namespace`
+    * `persistentvolume`
+    * `pvc`
 
-![alt text](images/airflow_cli.png)
+# Advanced setup
+Complete the basic setup prior to proceeding through this section.
 
-**NOTE**: You can exit out of the `k9s` shell by running the `exit` command, and you can "back out" of `k9s` filters by using `<esc>`.
+## Create a custom docker image
+Follow these steps to extend the base Airflow image as desired, e.g. to add a databricks provider.
 
-## Install Airflow 2 (advanced)
+1. Create a copy of the Dockerfile in this repo
+    ```bash
+    cp airflow-local/Dockerfile ~/${DAGS_DIR}/Dockerfile
+    ```
 
-If you want to install extra dependencies (e.g. a provider package) as part of your Airflow deployment you can do so in a custom Docker image.
+2. Edit the new dockerfile like so
+    ```
+    FROM apache/airflow
+    COPY . /opt/airflow/dags
+    RUN pip install --no-cache-dir apache-airflow-providers-databricks
+    ```
 
-### Update Dockerfile with relevant dependencies
+3. Build the image
+    ```bash
+    docker build --pull --tag my-image:0.0.1 ~/${DAGS_DIR}
+    ```
 
+## Start Airflow using the custom image
 ```
-FROM apache/airflow
-COPY . /opt/airflow/dags
-RUN pip install --no-cache-dir apache-airflow-providers-databricks
-```
-
-### Copy sample DAGs and Dockerfile to relevant directory
-
-```bash
-export DAGS_DIR="Documents/airflow-dags"
-mkdir ~/${DAGS_DIR}
-cp -r airflow-local/example-dags/* ~/${DAGS_DIR}
-cp airflow-local/Dockerfile ~/${DAGS_DIR}/Dockerfile
-```
-
-### Complete Airflow installation
-
-```bash
-docker build --pull --tag my-image:0.0.1 ~/${DAGS_DIR}
-helm repo add apache-airflow https://airflow.apache.org/
-helm repo update
-kubectl apply -f airflow-local/airflow-volume.yml
 helm install airflow apache-airflow/airflow \
-    --namespace default \
-    --version 1.6.0 -f airflow-local/values.yml \
+    --namespace airflow \
+    -f airflow-local/values.yml \
     --set images.airflow.repository=my-image \
     --set images.airflow.tag=0.0.1 \
     --wait=false
 ```
 
-**ref**: https://github.com/airflow-helm/charts/tree/main/charts/airflow#frequently-asked-questions
-
+ref: https://github.com/airflow-helm/charts/tree/main/charts/airflow#frequently-asked-questions
